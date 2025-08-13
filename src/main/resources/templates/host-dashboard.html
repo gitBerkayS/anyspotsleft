@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Host</title>
+  <link rel="stylesheet" th:href="@{/css/host-dashboard.css}">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Sharp" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fraunces:wght@900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo"> <a th:href="@{/}"><img th:src="@{/images/logo.png}"></a></div>
+  <div class="nav-buttons">
+    <a th:href="@{/host}" class="host-btn" sec:authorize="!isAuthenticated()">Become A Host</a>
+
+    <div class="hamburger-nav">
+      <button class="hamburger-lines" onclick="show()">
+        <div id="line-1" class="line"></div>
+        <div id="line-2" class="line"></div>
+        <div id="line-3" class="line"></div>
+      </button>
+      <nav>
+
+        <div class="profile-pic-wrapper" sec:authorize="isAuthenticated()">
+          <a th:href="@{/profile/{userId}(userId=${user.id})}">
+            <img th:src="${user.profileImage?.imageDataUrl} ?: @{/images/profilepictures/defaultPfp.svg}" class="profile-pic" alt="Profile Picture">
+          </a>
+        </div>
+
+        <ul class="hamburger-links" sec:authorize="!isAuthenticated()">
+          <li><a th:href="@{/login}">Login</a></li>
+          <li><a>How It Works</a></li>
+          <li><a>About</a></li>
+          <li><a>Contact Us</a></li>
+          <li><a>FAQ</a></li>
+        </ul>
+
+        <ul class="hamburger-links" sec:authorize="isAuthenticated()">
+          <li><a th:href="@{'/earnings' + ${userId}}">Earnings</a></li>
+          <li><a th:href="@{'/listings' + ${userId}}">Listings</a></li>
+          <li><a th:href="@{'/notifications' + ${userId}}">Notifications</a></li>
+          <li><a>Contact Us</a></li>
+          <li><a th:href="@{/logout}" onclick="localStorage.removeItem('hamburgerOpen')">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+  <div class="title_container">
+    <div class="title"> <h1> Welcome <span th:text="${user.getName()}"></span>,</h1></div>
+
+    <button th:if="${!#lists.isEmpty(activeHostListings)}" data-open="modal" type="button">
+      <p>Create listing</p>
+      <img th:src="@{/images/button/add_white.svg}" alt="new">
+    </button>
+  </div>
+
+  <!--/*@thymesVar id="activeHostListings" type="com.anyspotsleft.anyspotsleft.listing.ListingModel"*/-->
+  <div class="listing_container" th:if="${#lists.isEmpty(activeHostListings)}" >
+    <div class="new_list1">
+      <a data-open="modal">
+        <img class="new" th:src="@{/images/button/new.svg}" alt="new">
+        <p>Create a listing from scratch</p>
+        <img class="expand" th:src="@{/images/button/expand.svg}" alt="">
+      </a>
+    </div>
+
+    <div class="new_list2">
+      <a data-open="modal2">
+        <img id="existing" th:src="@{/images/button/existing.svg}" alt="new">
+        <p>Create a listing from an existing template</p>
+        <img class="expand" th:src="@{/images/button/expand.svg}" alt="">
+      </a>
+    </div>
+  </div>
+
+  <!--  to CREATE NEW LISTING-->
+  <div class="modal" id="modal">
+    <div class="modal_content">
+      <button class="close" data-close="modal" type="button" style="border:none; background:none; padding:0;">
+        <img th:src="@{/images/button/close.svg}" alt="close">
+      </button>
+        <div class="modal_content_form">
+          <h1>List Parking Spot</h1>
+          
+          <!--/*@thymesVar id="listingForm" type="com.anyspotsleft.anyspotsleft.listing.ListingDTO"*/-->
+
+          <form method="POST" th:object="${listingForm}" th:action="@{/listings/create}">
+            <select th:field="*{parkingSpotId}"
+                    th:with="usedSpotIds=${activeListings.![parkingSpot.id]}"
+                    required>
+              <option value="" disabled selected>Select a spot</option>
+
+              <option th:each="parkingSpot : ${allApprovedParkingSpotsByUser}"
+                      th:value="${parkingSpot.id}"
+                      th:text="${parkingSpot.address + ', ' + parkingSpot.city
+                   + (#lists.contains(usedSpotIds, parkingSpot.id) ? ' — already listed' : '')}"
+                      th:disabled="${#lists.contains(usedSpotIds, parkingSpot.id)}">
+              </option>
+            </select>
+
+            <input type="number" step="0.01" min="0.50" placeholder="price" th:field="*{cost}" name="price" required/>
+            <input type="number" min="1" th:field="*{availableSpots}" placeholder="available spots" required/>
+            <input type="datetime-local" th:field="*{endsAt}" required/>
+            <input type="text" rows="3" th:field="*{description}" placeholder="description">
+
+            <button type="submit"> Create listing</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  <!--  to SELECT TEMPLATE  -->
+  <div class="modal" id="modal2">
+    <div class="modal_content">
+
+      <button class="close" data-close="modal2" type="button" style="border:none; background:none; padding:0;">
+        <img th:src="@{/images/button/close.svg}" alt="close">
+      </button>
+
+      <div class="modal_content_form">
+        <h1>Template Selector</h1>
+        <form method="POST" th:action="@{/listings/new}">
+          <form method="POST" th:object="${listingForm}" th:action="@{/listings/create}">
+            <select>
+              <option value="" disabled selected>Select a template</option>
+            </select>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!--to APPLY FOR NEW PARKING SPOT  -->
+  <div class="modal" id="modal3">
+    <div class="modal_content">
+
+      <button class="close" data-close="modal3" type="button" style="border:none; background:none; padding:0;">
+        <img th:src="@{/images/button/close.svg}" alt="close">
+      </button>
+
+      <div class="modal_content_form">
+        <h1>Parking Spot Application</h1>
+
+        <!--/*@thymesVar id="parkingSpotForm" type="com.anyspotsleft.anyspotsleft.parkingspots.ParkingSpotDTO"*/-->
+        <form th:action="@{/parkingSpot/create}" th:object="${parkingSpotForm}" method="post" enctype="multipart/form-data">
+
+          <input th:field="*{address}"     placeholder="Address" required/>
+          <input th:field="*{city}"        placeholder="City" required/>
+          <input th:field="*{postalCode}"  placeholder="Postal Code" required/>
+          <input th:field="*{country}"     placeholder="Country" required/>
+
+          <div class="vehicles">
+            <p>Vehicles allowed:</p>
+
+            <!--/*@thymesVar id="vehicleTypes" type="com.anyspotsleft.anyspotsleft.vehicle.UserVehicle"*/-->
+            <label th:each="vehicle : ${vehicleTypes}">
+              <input type="checkbox" th:field="*{vehiclesAllowed}" th:value="${vehicle}"/>
+              <span th:text="${#strings.capitalizeWords(vehicle.name().toLowerCase().replace('_',' '))}"></span>
+            </label>
+          </div>
+
+          <input type="file" th:field="*{image}" accept="image/*"/>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div th:each="listing : ${activeHostListings}" class="listing_container">
+    <form class="close" th:action="@{/listings/remove}" method="post">
+      <input type="hidden" name="listingId" th:value="${listing.id}" />
+      <button type="submit" style="border:none; background:none; padding:0;">
+        <img th:src="@{/images/button/close.svg}" alt="close">
+      </button>
+    </form>
+
+    <p class="title" th:text="${listing.getParkingSpot().getAddress()}"></p>
+  </div>
+  </div>
+
+<!--/*@thymesVar id="allApprovedParkingSpotsByUser" type="com.anyspotsleft.anyspotsleft.parkingspots.ParkingSpotModel"*/-->
+<!--/*@thymesVar id="allPendingParkingSpotsByUser" type="com.anyspotsleft.anyspotsleft.parkingspots.ParkingSpotModel"*/-->
+<div class="parking-spots-container">
+  <div class="parking-spots-header">
+    <p th:if="${not #lists.isEmpty(allApprovedParkingSpotsByUser)}">Approved Spots</p>
+
+    <button data-open="modal3" type="button">
+      <p>Add parking spots</p>
+
+      <img th:src="@{/images/button/add_white.svg}" alt="new">
+
+    </button>
+  </div>
+  <div class="parking-spots-content">
+
+    <div th:each="parkingSpot : ${allApprovedParkingSpotsByUser}" class="parking-spots-card">
+      <img th:src="${parkingSpot.imageDataUrl} ?: @{/images/icons/error.svg}"
+         alt="listing" loading="lazy">
+
+
+
+      <div class="parking-spots-description">
+        <p class="title">Address of parking:</p>
+        <img  th:src="@{/images/icons/address.svg}" alt="address">
+        <p th:text="${parkingSpot.getAddress()} + ','"></p>
+
+        <p th:text="${parkingSpot.getCity()} + ', ' + ${parkingSpot.getCountry()}"></p>
+        <br>
+        <p class="title">Vehicles allowed:</p>
+        <img  th:src="@{/images/icons/car.svg}" alt="vehicle">
+        <p th:text="${#strings.capitalizeWords(#strings.toLowerCase(#strings.replace(#strings.listJoin(parkingSpot.getVehiclesAllowed(), ', '), '_',' ')))}"></p>
+
+      </div>
+    </div>
+
+
+  </div>
+
+  <div class="parking-spots-header">
+    <p th:if="${not #lists.isEmpty(allPendingParkingSpotsByUser)}">Pending Spots</p>
+
+
+  </div>
+  <div class="parking-spots-content">
+
+
+    <div th:each="parkingSpot : ${allPendingParkingSpotsByUser}" class="parking-spots-card">
+      <div class="parking-spots-pending"> </div>
+      <img th:src="${parkingSpot.imageDataUrl} ?: @{/images/icons/error.svg}"
+           alt="listing" loading="lazy">
+
+
+      <div class="parking-spots-description">
+
+          <p class="title">Address of parking:</p>
+          <img  th:src="@{/images/icons/address.svg}" alt="address">
+          <p th:text="${parkingSpot.getAddress()} + ','"></p>
+
+
+          <p th:text="${parkingSpot.getCity()} + ', ' + ${parkingSpot.getCountry()}"></p>
+          <br>
+          <p class="title">Vehicles allowed:</p>
+          <img  th:src="@{/images/icons/car.svg}" alt="vehicle">
+          <p th:text="${#strings.capitalizeWords(#strings.toLowerCase(#strings.replace(#strings.listJoin(parkingSpot.getVehiclesAllowed(), ', '), '_',' ')))}"></p>
+
+        </div>
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+<script th:src="@{/js/homepage.js}"></script>
+<script th:src="@{/js/modal.js}"></script>
+</body>
+</html>

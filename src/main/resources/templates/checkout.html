@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .card {
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .payment-container {
+            width: 65%;
+            background: #eaf8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-block {
+            background: #fff8dc;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .info-block p {
+            margin: 5px 0;
+        }
+
+        .summary {
+            background: #ffe6ea;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .summary p {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .summary p strong {
+            font-size: 17px;
+        }
+
+        .payment-method {
+            background: #fff8dc;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .add-card {
+            color: #f6b548;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: #444;
+            font-weight: bold;
+        }
+
+        input.form-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+
+        .pay-button {
+            width: 100%;
+            background-color: #a8e6a1;
+            color: #474646;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .pay-button:hover {
+            background-color: #90d890;
+        }
+
+        .parking-details {
+            width: 30%;
+            background: #e8f4fd;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .parking-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .parking-subtitle {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .parking-image img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .parking-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            background: #f1f9f2;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .detail-icon {
+            font-size: 18px;
+        }
+
+        .detail-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .lottery-stats {
+            background: #ffe6ea;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .stats-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .host-info {
+            background: #fff8dc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .host-avatar {
+            background: #4CAF50;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 10px;
+            border-radius: 50%;
+            font-size: 12px;
+        }
+
+        .host-name {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .host-rating {
+            font-size: 11px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Payment Section -->
+<div class="payment-container card">
+    <h2>Payment Details</h2>
+
+    <div class="info-block">
+        <p><strong>Email:</strong> xyz@gmail.com</p>
+        <p><strong>Phone:</strong> (604) 123-4567</p>
+    </div>
+
+    <div class="summary">
+        <p>Subtotal <span>$20.00</span></p>
+        <p>Service Fee <span>$2.00</span></p>
+        <p><strong>Total</strong> <span>$22.00</span></p>
+    </div>
+
+    <div class="payment-method">
+        <p class="section-title">Choose your payment method</p>
+        <p>Saved Card</p>
+        <span class="add-card">+ Add new card</span>
+        <p>Credit Card / Debit Card</p>
+
+
+    </div>
+
+    <button class="pay-button">Pay and Reserve</button>
+</div>
+
+<!--  Parking Details -->
+<div class="parking-details card">
+    <p class="parking-title">Downtown Office Building</p>
+    <p class="parking-subtitle">Parking Lottery Entry</p>
+
+    <div class="parking-image">
+        <img src="../../../../../../../Desktop/Aushna/Pyment/parking.webp" alt="Parking Location">
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-icon">📍</span>
+        <div class="detail-content">
+            <span class="detail-label">Location</span>
+            <span class="detail-value">456 Business Avenue, Downtown</span>
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-icon">📅</span>
+        <div class="detail-content">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">Tomorrow, June 26, 2025</span>
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-icon">⏰</span>
+        <div class="detail-content">
+            <span class="detail-label">Time</span>
+            <span class="detail-value">8:00 AM - 6:00 PM</span>
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-icon">🎫</span>
+        <div class="detail-content">
+            <span class="detail-label">Draw Time</span>
+            <span class="detail-value">Tonight at 8:00 PM</span>
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-icon">🚗</span>
+        <div class="detail-content">
+            <span class="detail-label">Vehicle</span>
+            <span class="detail-value">Toyota Camry (ABC-1234)</span>
+        </div>
+    </div>
+
+    <div class="lottery-stats">
+        <p class="stats-title">📊 Lottery Statistics</p>
+        <p class="stat-item"><span>Available Spots</span><span>2</span></p>
+        <p class="stat-item"><span>Current Entries</span><span>15 / 50</span></p>
+        <p class="stat-item"><span>Your Odds</span><span>~13%</span></p>
+        <p class="stat-item"><span>Entry Deadline</span><span>4h 23m left</span></p>
+    </div>
+
+    <div class="host-info">
+        <span class="host-avatar">SW</span>
+        <div>
+            <p class="host-name">Sarah Wood</p>
+            <p class="host-rating">⭐ 4.8 (24 reviews) • Verified Host</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

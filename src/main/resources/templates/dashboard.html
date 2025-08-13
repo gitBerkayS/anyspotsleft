@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="mapsApiKey" th:content="${@environment.getProperty('GOOGLE.API.KEY')}">
+    <title>anyspotsleft</title>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fraunces:wght@900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/homepage.css}">
+</head>
+<body>
+
+<script th:src="@{/js/searchSubmit.js}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUHYSfIdOkgIdewqrBLmlaCSEIoGm_Y4w&libraries=places"> </script>
+
+
+<header class="navbar">
+    <div class="logo"> <a th:href="@{/}"><img th:src="@{/images/logo.png}"></a></div>
+    <div class="nav-buttons">
+        <a th:href="@{/signup/host}" class="host-btn" sec:authorize="!isAuthenticated()">Become A Host</a>
+
+        <div class="hamburger-nav">
+            <button class="hamburger-lines" onclick="show()">
+                    <div id="line-1" class="line"></div>
+                    <div id="line-2" class="line"></div>
+                    <div id="line-3" class="line"></div>
+            </button>
+            <nav>
+                <div class="profile-pic-wrapper" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/profile/{userId}(userId=${user.id})}">
+                        <img th:src="${user.profileImage?.imageDataUrl} ?: @{/images/profilepictures/defaultPfp.svg}" class="profile-pic" alt="Profile Picture">
+                    </a>
+                </div>
+                <ul class="hamburger-links" sec:authorize="!isAuthenticated()">
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a>How It Works</a></li>
+                    <li><a>About</a></li>
+                    <li><a>Contact Us</a></li>
+                    <li><a>FAQ</a></li>
+                </ul>
+
+                <ul class="hamburger-links" sec:authorize="isAuthenticated()">
+                    <li><a th:href="@{'/entries' + ${userId}}">Entries</a></li>
+                    <li><a th:href="@{'/results' + ${userId}}">Results</a></li>
+                    <li><a th:href="@{'/notifications' + ${userId}}">Notifications</a></li>
+                    <li><a>Contact Us</a></li>
+                    <li><a th:href="@{/logout}" onclick="localStorage.removeItem('hamburgerOpen')">Logout</a></li>
+                </ul>
+
+            </nav>
+        </div>
+
+    </div>
+</header>
+
+<main class="hero">
+    <h1>Parking made simple, wherever you go</h1>
+
+    <div class="subtext-block">
+        <p class="subtext">request your spot, park closer for less</p>
+    </div>
+
+    <form class="search-bar-form" method="GET" th:action="@{/discover}">
+    <div class="search-bar">
+        <img th:src="@{/images/icons/search-icon.svg}" alt="Search" class="search-icon">
+        <input type="text" id="searchInput" name="location" placeholder="Search by city or postal code">
+
+        <input type="hidden" name="location" id="hiddenLocationInput">
+        <button id="realSubmitBtn" type="submit" hidden></button>
+        <a id="currentLocationBtn" class="currentLocation">
+            <img th:src="@{/images/icons/currentlocation.svg}" alt="Use Current Location">
+        </a>
+
+    </div>
+
+        </form>
+</main>
+
+<script th:src="@{/js/homepage.js}"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:billing_address_collection="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navigation.css}">
+    <link rel="stylesheet" th:href="@{/css/discover.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fraunces:wght@900&display=swap" rel="stylesheet">
+
+
+    <meta charset="UTF-8" name="mapsApiKey" th:content="${@environment.getProperty('GOOGLE.API.KEY')}">
+    <title>Map Test</title>
+</head>
+<body>
+    <div class="title_container">
+        <header class="navbar">
+            <div class="logo"> <a th:href="@{/}"><img th:src="@{/images/logo.png }" alt=""></a></div>
+            <div class="nav-buttons">
+                <a th:href="@{/host}" class="host-btn" sec:authorize="!isAuthenticated()">Become A Host</a>
+
+                <div class="hamburger-nav">
+                    <button class="hamburger-lines" onclick="show()">
+                        <div id="line-1" class="line"></div>
+                        <div id="line-2" class="line"></div>
+                        <div id="line-3" class="line"></div>
+                    </button>
+                    <nav>
+                        <ul class="hamburger-links" sec:authorize="!isAuthenticated()">
+                            <li><a th:href="@{/login}">Login</a></li>
+                            <li><a>How It Works</a></li>
+                            <li><a>About</a></li>
+                            <li><a>Contact Us</a></li>
+                            <li><a>FAQ</a></li>
+                        </ul>
+
+                        <ul class="hamburger-links" sec:authorize="isAuthenticated()">
+                            <li><a th:href="@{'/entries' + ${userId}}">Entries</a></li>
+                            <li><a th:href="@{'/results' + ${userId}}">Results</a></li>
+                            <li><a th:href="@{'/notifications' + ${userId}}">Notifications</a></li>
+                            <li><a>Contact Us</a></li>
+                            <li><a th:href="@{/logout}" onclick="localStorage.removeItem('hamburgerOpen')">Logout</a></li>
+                        </ul>
+                        <div class="profile-pic-wrapper" sec:authorize="isAuthenticated()">
+                            <a th:href="@{/profile/{userId}(userId=${user.id})}">
+                                <img th:src="${user.profileImage?.imageDataUrl} ?: @{/images/profilepictures/defaultPfp.svg}" class="profile-pic" alt="Profile Picture">
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+
+            </div>
+        </header></div>
+    <div class="map-listing-page">
+        <div class="listing-panel">
+            <div class="listing-grid">
+                <!--/* @thymesVar id="activeListings" type="java.util.List<com.anyspotsleft.anyspotsleft.listing.ListingModel>" */-->
+                <!--/* @thymesVar id="listing" type="com.anyspotsleft.anyspotsleft.listing.ListingModel" */-->
+                <div th:each="listing : ${activeListings}" class="parking-spots-card">
+                    <img class="listing-image" th:src="${listing.parkingSpot.imageDataUrl} ?: @{/images/icons/error.svg}"
+                         alt="listing" loading="lazy">
+                    <div class="parking-details-left">
+                        <h2 th:text="${listing.getParkingSpot().address}">Listing Title</h2>
+                        <p class="subtitle" th:text="${listing.getParkingSpot().city}">Sub-Location</p>
+                        <p class="lotsAvailable" th:text="${listing.getAvailableSpots()} + ' Lots Available'"></p>
+                    </div>
+                    <div class="parking-details-right">
+                        <form sec:authorize="isAuthenticated()" th:action="@{/discover/favourite/{id}(id=${listing.id})}" method="POST" style="display:inline;">
+                            <button type="submit" style="background: none; border: none; padding: 0;">
+                                <img th:src="${user.favouriteListings.contains(listing)} ?
+                                  @{/images/button/star1.svg} :
+                                  @{/images/button/star.svg}"
+                                     alt="Toggle Favourite" class="star">
+                            </button>
+                        </form>
+                        <form th:action="@{/discover/{listingId}(listingId=${listing.id})}" method="POST" style="display:inline;">
+                            <button sec:authorize="isAuthenticated()" th:attr="data-open=${'modal-' + listing.id}" method="POST" type="submit" style="background: none; border: none; padding: 0;">
+                                <img th:src="${(idOfAllListingsEnteredByUser.contains(listing.id))} ? @{/images/button/expand1.svg} : @{/images/button/expand.svg}" class="expand" alt="Expand View">
+                            </button>
+                        </form>
+                        <p class="cost" th:text="'$' + ${listing.cost}"></p>
+                    </div>
+
+                    <div class="modal" th:id="${'modal-' + listing.id}">
+
+                        <div class="modal_content">
+
+                            <h3 th:text="${listing.getParkingSpot().address}"></h3>
+                            <p th:text="'Available Spots - ' + ${listing.getAvailableSpots()}"></p>
+                            <p th:text="'Cost - $' + ${listing.getCost()}"> </p>
+                            <p th:text="'Description - ' + ${listing.getDescription()}"></p>
+                            <form th:action="@{/listings/join/{listingId}(listingId=${listing.id})}" method="POST" id="stripeForm">
+                                <input type="hidden" th:name="listingId" th:value="${listing.id}">
+                                <button type="submit" id="payJoinBtn">Pay & Join</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="map-container" id="map"></div>
+
+    <script th:inline="javascript"> window.listings = /*[[${listingJSData}]]*/ [];</script>
+    <script th:src="@{/js/homepage.js}"></script>
+    <script th:src="@{/js/exploreMap.js}"></script>
+    <script th:src="@{/js/modal.js}"></script>
+</body>
+</html>
+

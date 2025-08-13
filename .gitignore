@@ -1,0 +1,48 @@
+# --- Java / Maven ---
+target/
+*.class
+*.log
+*.hprof
+hs_err_pid*
+# optional build dirs
+build/
+out/
+
+# --- IntelliJ / VS Code ---
+.idea/
+*.iml
+.vscode/
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+
+# --- Node / Frontend (if present) ---
+node_modules/
+dist/
+coverage/
+
+# --- Local env & secrets ---
+.env
+.env.*
+*.key
+*.pem
+*.p12
+
+# --- Spring Boot local configs ---
+application-local.properties
+application-local.yml
+# Commit only sanitized examples:
+# application-example.yml
+# .env.sample
+
+# --- Generated / temp ---
+*.swp
+*.swo
+
+# --- Docker (if you bind local data) ---
+pgdata/
+*.pid
+
+/HELP.md
+/src/main/resources/application.properties

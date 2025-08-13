@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/userAccount.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fraunces:wght@900&display=swap" rel="stylesheet">
+</head>
+<body>
+<script th:src="@{/js/homepage.js}"></script>
+
+<header class="navbar">
+<div class="logo"> <a th:href="@{/}"><img th:src="@{/images/logo.png}"></a></div>
+<div class="nav-buttons">
+    <a th:href="@{/host}" class="host-btn" sec:authorize="!isAuthenticated()">Become A Host</a>
+
+    <div class="hamburger-nav">
+        <button class="hamburger-lines" onclick="show()">
+            <div id="line-1" class="line"></div>
+            <div id="line-2" class="line"></div>
+            <div id="line-3" class="line"></div>
+        </button>
+        <nav>
+
+            <div class="profile-pic-wrapper" sec:authorize="isAuthenticated()">
+                <a th:href="@{/profile/{userId}(userId=${user.id})}">
+                    <img th:src="${user.profileImage?.imageDataUrl} ?: @{/images/profilepictures/defaultPfp.svg}" class="profile-pic" alt="Profile Picture">
+                </a>
+            </div>
+
+            <ul class="hamburger-links" sec:authorize="!isAuthenticated()">
+                <li><a th:href="@{/login}">Login</a></li>
+                <li><a>How It Works</a></li>
+                <li><a>About</a></li>
+                <li><a>Contact Us</a></li>
+                <li><a>FAQ</a></li>
+            </ul>
+
+            <ul class="hamburger-links" sec:authorize="isAuthenticated()">
+                <li><a th:href="@{'/entries' + ${userId}}">Entries</a></li>
+                <li><a th:href="@{'/results' + ${userId}}">Results</a></li>
+                <li><a th:href="@{'/notifications' + ${userId}}">Notifications</a></li>
+                <li><a>Contact Us</a></li>
+                <li><a th:href="@{/logout}" onclick="localStorage.removeItem('hamburgerOpen')">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</header>
+
+<div class="pageContainer">
+    <div class="error" th:text="${error}"></div>
+    <div class="carbox">
+
+        <div class="vehicleDetails">
+            <h1>Vroom vroom,</h1>
+            <h1 th:text="${user.name}"></h1>
+            <p sec:authorize="hasRole('USER')" style="margin-top:20px;">the keys to a new ride are just a dropdown away!</p>
+            <form sec:authorize="hasRole('USER')" class="carDetailsForm" th:action="@{/profile/{userId}(userId=${user.id})}" method="POST">
+                <label for="vehicleType"> Your current ride is a</label>
+
+                <select name="vehicleType" id="vehicleType" onchange="updateVehicleImage()">
+                    <option th:each="type : ${vehicleTypes}"
+                            th:value="${type}"
+                            th:text="${type}"
+                            th:selected="${vehicle?.type} == ${type}">
+                    </option>
+                </select>
+
+                <br><br>
+                <button type="submit">Save</button>
+            </form>
+        </div>
+        <img sec:authorize="hasRole('USER')" th:src="@{/images/cartypes/{type}.png(type=${vehicle?.type})}">
+        <img sec:authorize="hasRole('HOST')" th:src="@{/images/{type}.svg(type=garage)}">
+        <img sec:authorize="hasRole('ADMIN')" style="height: 140px; width: 140px;" th:src="@{/images/{type}.svg(type=insurance)}">
+    </div>
+</div>
+
+<div class="pageContainer">
+    <div class="topContainer">
+        <div class="signinDetails">
+            <h4>Account</h4>
+
+            <!--/*@thymesVar id="user" type="com.anyspotsleft.anyspotsleft.user.UserModel"*/-->
+            <form method="POST" th:action="@{/profile/{userId}/changeEmailPassword(userId=${user?.id})}">
+            <div class="inline">
+                <p class="p1">Email: </p>
+                <input class="p2" type="email" name="email" th:placeholder="${user.email}" >
+            </div>
+            <br>
+            <div class="inline">
+                <p class="p1">Password: </p>
+                <input class="p2" type="password" name="password" placeholder="**********" >
+            </div>
+                <button type="submit"> Update </button>
+            </form>
+        </div>
+
+        <div class="notificationDetails">
+            <h4>Notifications & Alerts</h4>
+            <div class="inline">
+                <input type="checkbox" class="p1" name="notification" value="email">
+                <p class="p2">Email Alerts</p>
+            </div>
+            <br>
+            <div class="inline">
+                <br>
+                <input type="checkbox" class="p1" name="notification" value="sms">
+                <p class="p2">Text Messages</p>
+            </div>
+            <br>
+            <div class="inline">
+
+                <input type="checkbox" class="p1" name="notification" value="market">
+                <p class="p2">Promotional Offers</p>
+            </div>
+            <button type="submit"> Update </button>
+        </div>
+    </div>
+</div>
+
+<div class="pageContainer">
+    <div class="middleContainer">
+        <div class="paymentDetails">
+            <h4>Payments</h4>
+            <div class="inline">
+                <p class="p1">Visit our payment partner to manage payments</p></a>
+            </div>
+            <button type="submit"> STRIPE </button>
+        </div>
+
+        <div class="appearanceDetails">
+            <h4>Appearance</h4>
+            <form method="POST" th:action="@{/profile/{userId}/uploadImage(userId=${user?.id})}" enctype="multipart/form-data">
+            <div class="inline">
+                <br>
+                <br>
+                <input type="file" class="p3" accept="image/*" name="file">
+            </div>
+            <button type="submit"> Update </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    function updateVehicleImage() {
+        const select = document.getElementById('vehicleType');
+        const selectedType = select.value;
+        const img = document.getElementById('vehicleImage');
+        img.src = `/images/${selectedType}.png`;
+    }
+</script>
+
+</body>
+</html>

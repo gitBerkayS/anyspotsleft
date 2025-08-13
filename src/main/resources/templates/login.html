@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>anyspotsleft | Login to an account</title>
+    <link rel="stylesheet" th:href="@{/css/stylesheet.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="logo"> <a th:href="@{/}"><img th:src="@{/images/logo.png}"></a></div>
+</header>
+
+<div class="signup-container">
+    <div class="signup">
+        <h1>Login to account</h1>
+        <form method="POST" action="/login">
+            <input type="email" name="email" placeholder="Email" autocomplete="off" required>
+            <input type="password" name="password" placeholder="Password" autocomplete="off" required>
+            <button type="submit">Continue</button>
+        </form>
+        <p class="login-text">Don't have an account? <a th:href="@{/signup}"> Sign up</a></p>
+
+        <div class="oauth-divider">
+            <hr><span>OR</span><hr>
+        </div>
+
+        <div class="oauth-buttons">
+            <button class="oauth-btn apple"> Login with Apple</button>
+            <button class="oauth-btn google">G Login with Google</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
