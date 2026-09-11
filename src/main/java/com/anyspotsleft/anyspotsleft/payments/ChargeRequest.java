@@ -7,6 +7,7 @@ public class ChargeRequest {
     public enum Currency {
         CAD, USD;
     }
+
     private String description;
     private long amount;
     private Currency currency;

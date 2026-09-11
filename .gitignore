@@ -31,10 +31,9 @@ coverage/
 
 # --- Spring Boot local configs ---
 application-local.properties
+**/application-local.properties
 application-local.yml
-# Commit only sanitized examples:
-# application-example.yml
-# .env.sample
+**/application-local.yml
 
 # --- Generated / temp ---
 *.swp
@@ -45,4 +44,3 @@ pgdata/
 *.pid
 
 /HELP.md
-/src/main/resources/application.properties

@@ -12,8 +12,8 @@
 </head>
 <body>
 
+<script th:src="@{|https://maps.googleapis.com/maps/api/js?key=${@environment.getProperty('GOOGLE.API.KEY')}&libraries=places|}"></script>
 <script th:src="@{/js/searchSubmit.js}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUHYSfIdOkgIdewqrBLmlaCSEIoGm_Y4w&libraries=places"> </script>
 
 
 <header class="navbar">

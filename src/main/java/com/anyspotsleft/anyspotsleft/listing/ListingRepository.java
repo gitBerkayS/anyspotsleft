@@ -17,5 +17,7 @@ public interface ListingRepository extends JpaRepository<ListingModel,Long> {
     boolean existsByParkingSpotIdAndActiveIsTrue(Long parkingSpotId);
 
     List<ListingModel> getByCost(double cost);
+
+
 }
 
